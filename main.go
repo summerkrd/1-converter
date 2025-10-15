@@ -1,16 +1,24 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func main() {
 
 	const (
-		USD = 1.0
-		EUR = 0.8
-		RUB = 81.9
+		USD = "USD"
+		EUR = "EUR"
+		RUB = "RUB"
 	)
 
-	calculateCurrency(userInput(USD, EUR, RUB))
+	currencyMap := map[string]float64{
+		USD: 1.0,
+		EUR: 0.8,
+		RUB: 81.9,
+	}
+
+	calculateCurrency(userInput(currencyMap[USD], currencyMap[EUR], currencyMap[RUB]))
 }
 
 func userInput(usd float64, eur float64, rub float64) (count float64, original float64, target float64) {
