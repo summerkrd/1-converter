@@ -7,21 +7,21 @@ import (
 func main() {
 
 	const (
-		USD = "USD"
-		EUR = "EUR"
-		RUB = "RUB"
+		USD = 1
+		EUR = 2
+		RUB = 3
 	)
 
-	currencyMap := map[string]float64{
+	currencyMap := map[int]float64{
 		USD: 1.0,
 		EUR: 0.8,
 		RUB: 81.9,
 	}
 
-	calculateCurrency(userInput(currencyMap[USD], currencyMap[EUR], currencyMap[RUB]))
+	calculateCurrency(userInput(currencyMap))
 }
 
-func userInput(usd float64, eur float64, rub float64) (count float64, original float64, target float64) {
+func userInput(curr map[int]float64) (count float64, original float64, target float64) {
 
 	const (
 		USDId = 1
@@ -76,25 +76,7 @@ func userInput(usd float64, eur float64, rub float64) (count float64, original f
 		}
 	}
 
-	switch originalID {
-	case 1:
-		original = usd
-	case 2:
-		original = eur
-	case 3:
-		original = rub
-	}
-
-	switch targetID {
-	case 1:
-		target = usd
-	case 2:
-		target = eur
-	case 3:
-		target = rub
-	}
-
-	return count, original, target
+	return count, curr[originalID], curr[targetID]
 }
 
 func calculateCurrency(count float64, original float64, target float64) {
