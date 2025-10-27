@@ -13,9 +13,19 @@ func ReadFile(name string) {
 		fmt.Println("Не удалось прочитать")
 	}
 
-	var v any
-	err = json.Unmarshal(data, &v)
-	if err != nil {
+	isJSON, _ := checkJSON(data)
+
+	if !isJSON {
 		fmt.Println("Файл не является JSON")
+		return
 	}
+}
+
+func checkJSON(data []byte) (isJSON bool, v any) {
+
+	err := json.Unmarshal(data, v)
+	if err != nil {
+		return false, nil
+	}
+	return
 }

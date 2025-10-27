@@ -33,5 +33,10 @@ func ReadBinFromJSON(fileName string) {
 		fmt.Println("Не удалось прочитать")
 	}
 
-	fmt.Println(string(data))
+	var readingBin bins.Bin
+
+	err = json.Unmarshal(data, &readingBin)
+	if err != nil {
+		fmt.Println("Не удалось преобразовать")
+	}
 }
