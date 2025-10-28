@@ -7,7 +7,9 @@ import (
 	"os"
 )
 
-func SaveBinToJSON(bin bins.Bin) {
+type Bin bins.Bin
+
+func SaveBinToJSON(bin Bin) {
 
 	file, err := os.Create("bin.json")
 	if err != nil {
