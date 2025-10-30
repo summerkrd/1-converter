@@ -1,10 +1,9 @@
 package main
 
-import (
-	"3-struct/bins"
-)
+import "3-struct/storage"
+
+type BinStorage = storage.BinStorage
 
 func main() {
-	newBin := bins.NewBin
 
 }
