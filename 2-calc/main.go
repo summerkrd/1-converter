@@ -12,28 +12,24 @@ import (
 
 func main() {
 
-	const AVGId = 1
-	const SUMID = 2
-	const MEDId = 3
-
-	var currentId int
+	var userInput string
 
 	var intSlice []int
 	var strSlice string
 
-	calculate := map[int]func([]int) string{
-		1: calculateAvg,
-		2: calculateSumm,
-		3: calculateMed,
+	calculate := map[string]func([]int) string{
+		"avg": calculateAvg,
+		"sum": calculateSumm,
+		"med": calculateMed,
 	}
 
 	for {
 
-		fmt.Print("Выберите операцию: (1-Среднее/2-Сумма/3-Медиана): ")
+		fmt.Print("Выберите операцию: (avg - Среднее/sum - Сумма/med - Медиана): ")
 
-		_, err := fmt.Scan(&currentId)
+		_, err := fmt.Scan(&userInput)
 
-		if currentId < AVGId || currentId > MEDId || err != nil {
+		if userInput == "" || err != nil {
 			continue
 		}
 
@@ -59,22 +55,7 @@ func main() {
 		break
 	}
 
-	fmt.Print(calculate[currentId](intSlice))
-
-	//switch currentId {
-	//
-	//case AVGId:
-	//	fmt.Print("Среднее значение: ")
-	//	fmt.Print(calculateAvg(intSlice))
-	//
-	//case SUMID:
-	//	fmt.Print("Сумма: ")
-	//	fmt.Print(calculateSumm(intSlice))
-	//
-	//case MEDId:
-	//	fmt.Print("Медиана: ")
-	//	fmt.Print(calculateMed(intSlice))
-	//}
+	fmt.Print(calculate[userInput](intSlice))
 }
 
 func inputNumbersHandler(input string) ([]int, error) {
