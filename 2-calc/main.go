@@ -21,6 +21,12 @@ func main() {
 	var intSlice []int
 	var strSlice string
 
+	calculate := map[int]func([]int) string{
+		1: calculateAvg,
+		2: calculateSumm,
+		3: calculateMed,
+	}
+
 	for {
 
 		fmt.Print("Выберите операцию: (1-Среднее/2-Сумма/3-Медиана): ")
@@ -53,20 +59,22 @@ func main() {
 		break
 	}
 
-	switch currentId {
+	fmt.Print(calculate[currentId](intSlice))
 
-	case AVGId:
-		fmt.Print("Среднее значение: ")
-		fmt.Print(calculateAvg(intSlice))
-
-	case SUMID:
-		fmt.Print("Сумма: ")
-		fmt.Print(calculateSumm(intSlice))
-
-	case MEDId:
-		fmt.Print("Медиана: ")
-		fmt.Print(calculateMed(intSlice))
-	}
+	//switch currentId {
+	//
+	//case AVGId:
+	//	fmt.Print("Среднее значение: ")
+	//	fmt.Print(calculateAvg(intSlice))
+	//
+	//case SUMID:
+	//	fmt.Print("Сумма: ")
+	//	fmt.Print(calculateSumm(intSlice))
+	//
+	//case MEDId:
+	//	fmt.Print("Медиана: ")
+	//	fmt.Print(calculateMed(intSlice))
+	//}
 }
 
 func inputNumbersHandler(input string) ([]int, error) {
@@ -97,7 +105,7 @@ func inputNumbersHandler(input string) ([]int, error) {
 	return handled, nil
 }
 
-func calculateSumm(arr []int) int {
+func calculateSumm(arr []int) string {
 
 	sum := 0
 
@@ -105,22 +113,29 @@ func calculateSumm(arr []int) int {
 		sum += v
 	}
 
-	return sum
+	return fmt.Sprintln("Сумма: ", sum)
 }
 
-func calculateAvg(arr []int) float64 {
+func calculateAvg(arr []int) string {
 
-	return float64(calculateSumm(arr)) / float64(len(arr))
+	sum := 0
+
+	for _, v := range arr {
+		sum += v
+	}
+
+	avg := float64(sum) / float64(len(arr))
+	return fmt.Sprintln("Среднее значение: ", avg)
 }
 
-func calculateMed(arr []int) float64 {
+func calculateMed(arr []int) string {
 
 	sort.Ints(arr)
 	middle := len(arr) / 2
 
 	if len(arr)%2 == 0 {
-		return float64(arr[middle-1]+arr[middle]) / 2.0
+		return fmt.Sprintln("Медиана: ", float64(arr[middle-1]+arr[middle])/2.0)
+	} else {
+		return fmt.Sprintln("Медиана: ", float64(arr[middle]))
 	}
-
-	return float64(arr[middle])
 }
