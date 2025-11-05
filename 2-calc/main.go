@@ -1,6 +1,8 @@
 package main
 
 import (
+	"2-calc/api"
+	"2-calc/config"
 	"bufio"
 	"errors"
 	"fmt"
@@ -12,16 +14,25 @@ import (
 
 func main() {
 
-	var userInput string
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		fmt.Println("Ошибка загрузки конфига:", err)
+		return
+	}
 
-	var intSlice []int
-	var strSlice string
+	apiClient := api.NewClient(cfg)
+	fmt.Println("API ключ загружен:", apiClient.GetKey())
 
 	calculate := map[string]func([]int) string{
 		"avg": calculateAvg,
 		"sum": calculateSumm,
 		"med": calculateMed,
 	}
+
+	var userInput string
+
+	var intSlice []int
+	var strSlice string
 
 	for {
 
