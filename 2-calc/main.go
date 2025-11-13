@@ -1,6 +1,8 @@
 package main
 
 import (
+	"2-calc/api"
+	"2-calc/config"
 	"bufio"
 	"errors"
 	"fmt"
@@ -12,22 +14,33 @@ import (
 
 func main() {
 
-	const AVGId = 1
-	const SUMID = 2
-	const MEDId = 3
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		fmt.Println("Ошибка загрузки конфига:", err)
+		return
+	}
 
-	var currentId int
+	apiClient := api.NewClient(cfg)
+	fmt.Println("API ключ загружен:", apiClient.GetKey())
+
+	calculate := map[string]func([]int) string{
+		"avg": calculateAvg,
+		"sum": calculateSumm,
+		"med": calculateMed,
+	}
+
+	var userInput string
 
 	var intSlice []int
 	var strSlice string
 
 	for {
 
-		fmt.Print("Выберите операцию: (1-Среднее/2-Сумма/3-Медиана): ")
+		fmt.Print("Выберите операцию: (avg - Среднее/sum - Сумма/med - Медиана): ")
 
-		_, err := fmt.Scan(&currentId)
+		_, err := fmt.Scan(&userInput)
 
-		if currentId < AVGId || currentId > MEDId || err != nil {
+		if userInput == "" || err != nil {
 			continue
 		}
 
@@ -53,20 +66,7 @@ func main() {
 		break
 	}
 
-	switch currentId {
-
-	case AVGId:
-		fmt.Print("Среднее значение: ")
-		fmt.Print(calculateAvg(intSlice))
-
-	case SUMID:
-		fmt.Print("Сумма: ")
-		fmt.Print(calculateSumm(intSlice))
-
-	case MEDId:
-		fmt.Print("Медиана: ")
-		fmt.Print(calculateMed(intSlice))
-	}
+	fmt.Print(calculate[userInput](intSlice))
 }
 
 func inputNumbersHandler(input string) ([]int, error) {
@@ -97,7 +97,7 @@ func inputNumbersHandler(input string) ([]int, error) {
 	return handled, nil
 }
 
-func calculateSumm(arr []int) int {
+func calculateSumm(arr []int) string {
 
 	sum := 0
 
@@ -105,22 +105,29 @@ func calculateSumm(arr []int) int {
 		sum += v
 	}
 
-	return sum
+	return fmt.Sprintln("Сумма: ", sum)
 }
 
-func calculateAvg(arr []int) float64 {
+func calculateAvg(arr []int) string {
 
-	return float64(calculateSumm(arr)) / float64(len(arr))
+	sum := 0
+
+	for _, v := range arr {
+		sum += v
+	}
+
+	avg := float64(sum) / float64(len(arr))
+	return fmt.Sprintln("Среднее значение: ", avg)
 }
 
-func calculateMed(arr []int) float64 {
+func calculateMed(arr []int) string {
 
 	sort.Ints(arr)
 	middle := len(arr) / 2
 
 	if len(arr)%2 == 0 {
-		return float64(arr[middle-1]+arr[middle]) / 2.0
+		return fmt.Sprintln("Медиана: ", float64(arr[middle-1]+arr[middle])/2.0)
+	} else {
+		return fmt.Sprintln("Медиана: ", float64(arr[middle]))
 	}
-
-	return float64(arr[middle])
 }
