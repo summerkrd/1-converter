@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -16,7 +15,7 @@ func LoadConfig() (*Config, error) {
 
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Println("Предупреждение: .env файл не найден")
+		return nil, fmt.Errorf("предупреждение: .env файл не найден")
 	}
 
 	key := os.Getenv("KEY")
