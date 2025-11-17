@@ -3,6 +3,7 @@ package main
 import (
 	"2-calc/api"
 	"2-calc/config"
+	"2-calc/data"
 	"flag"
 	"fmt"
 )
@@ -36,19 +37,31 @@ func flagsHandler(client *api.Client) {
 		if *fFile != "" && *fName != "" {
 			client.CreateBin()
 		}
+
 	} else if *fUpdate != "" {
 		if *fFile != "" && *fID != 0 {
 			client.UpdateBin()
 		}
+
 	} else if *fDelete != "" {
 		if *fID != 0 {
 			client.DeleteBin()
 		}
+
 	} else if *fGet != "" {
 		if *fID != 0 {
 			client.GetBin()
 		}
+
 	} else if *fList != "" {
+		binsData, err := data.ReadFile()
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+		for _, bin := range *binsData{
+			fmt.Println("name: " + bin.Name + "\nid: " + bin.ID)
+		}
 
 	} else {
 		fmt.Println("Введены не корректные данные")
