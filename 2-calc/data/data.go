@@ -28,6 +28,24 @@ func ReadFile() (*[]BinInfo, error) {
 	return &bins, nil
 }
 
+func AddLocalBin(bins *[]BinInfo, newBin BinInfo) *[]BinInfo {
+
+	*bins = append(*bins, newBin)
+	return bins
+}
+
+func RemoveLocalBin(bins *[]BinInfo, rID string) *[]BinInfo {
+	newBins := make([]BinInfo, 0)
+
+	for _, bin := range *bins {
+		if bin.ID != rID {
+			newBins = append(*bins, bin)
+		}
+	}
+
+	return &newBins
+}
+
 func WriteFile(bins *[]BinInfo) error {
 	newData, err := json.Marshal(bins)
 	if err != nil {
@@ -39,4 +57,12 @@ func WriteFile(bins *[]BinInfo) error {
 		return errors.New("ошибка: не удалось записать json")
 	}
 	return nil
+}
+
+func ReadUserJSON(fName string) (*[]byte, error) {
+	data, err := os.ReadFile(fName)
+	if err != nil {
+		return nil, errors.New("ошибка: не удалось прочитать userJSON")
+	}
+	return &data, nil
 }

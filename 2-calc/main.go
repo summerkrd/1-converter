@@ -29,13 +29,34 @@ func flagsHandler(client *api.Client) {
 	fGet := flag.String("get", "", "получить bin")
 	fList := flag.String("list", "", "список bins")
 	fFile := flag.String("file", "", "файл")
-	fName := flag.String("name", "", "имя файла")
+	fName := flag.String("name", "", "имя бина")
 	fID := flag.Int("id", 0, "id")
 	flag.Parse()
 
+	LocalBinsData, err := data.ReadFile()
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
 	if *fCreate != "" {
 		if *fFile != "" && *fName != "" {
-			client.CreateBin()
+			userData, err := data.ReadUserJSON(*fFile)
+			if err != nil {
+				fmt.Println("ошибка: не удалось прочитать UserJSON")
+				return
+			}
+			id := client.CreateBin(*userData, *fName)
+
+			newBin := data.BinInfo{
+				ID:   id,
+				Name: *fName,
+			}
+
+			err = data.WriteFile(data.AddLocalBin(LocalBinsData, newBin))
+			if err != nil {
+				fmt.Println(err.Error())
+			}
 		}
 
 	} else if *fUpdate != "" {
@@ -50,17 +71,12 @@ func flagsHandler(client *api.Client) {
 
 	} else if *fGet != "" {
 		if *fID != 0 {
-			client.GetBin()
+			client.GetBin(*fID)
 		}
 
 	} else if *fList != "" {
-		binsData, err := data.ReadFile()
-		if err != nil {
-			fmt.Println(err.Error())
-			return
-		}
-		for _, bin := range *binsData{
-			fmt.Println("name: " + bin.Name + "\nid: " + bin.ID)
+		for _, bin := range *LocalBinsData {
+			fmt.Println("name: " + bin.Name + "\nid: " + bin.ID + "\n\n")
 		}
 
 	} else {

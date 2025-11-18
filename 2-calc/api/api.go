@@ -2,15 +2,25 @@ package api
 
 import (
 	"2-calc/config"
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 type Client struct {
 	apiKey  string
 	baseURL string
+}
+
+type Response struct {
+	Metadata struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"metadata"`
 }
 
 func NewClient(cfg *config.Config) *Client {
@@ -28,12 +38,50 @@ func (c *Client) SendRequest() {
 	fmt.Println("Здесь будет HTTP запрос с ключом:", c.apiKey)
 }
 
-func (c *Client) CreateBin() {
+func (c *Client) CreateBin(data []byte, binName string) string {
 
+	req, err := http.NewRequest("POST", c.baseURL, bytes.NewBuffer(data))
+	if err != nil {
+		fmt.Println(err.Error())
+		return ""
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Master-Key", c.apiKey)
+	req.Header.Set("X-Bin-Name", binName)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("ошибка: " + err.Error())
+		return ""
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 201 {
+		fmt.Println("ошибка: статус код " + resp.Status)
+		return ""
+	}
+
+	byteData, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err.Error())
+		return ""
+	}
+
+	var response Response
+	err = json.Unmarshal(byteData, &response)
+	if err != nil {
+		fmt.Println("ошибка: " + err.Error())
+		return ""
+	}
+
+	return response.Metadata.ID
 }
 
-func (c *Client) GetBin(id string) {
-	currentURL, err := url.Parse(c.baseURL + "/" + id)
+func (c *Client) GetBin(id int) {
+	currentURL, err := url.Parse(c.baseURL + "/" + strconv.Itoa(id))
 	if err != nil {
 		fmt.Println(err.Error())
 		return
