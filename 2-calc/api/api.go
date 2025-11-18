@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"strconv"
 )
 
 type Client struct {
@@ -32,10 +31,6 @@ func NewClient(cfg *config.Config) *Client {
 
 func (c *Client) GetKey() string {
 	return c.apiKey
-}
-
-func (c *Client) SendRequest() {
-	fmt.Println("Здесь будет HTTP запрос с ключом:", c.apiKey)
 }
 
 func (c *Client) CreateBin(data []byte, binName string) string {
@@ -80,8 +75,8 @@ func (c *Client) CreateBin(data []byte, binName string) string {
 	return response.Metadata.ID
 }
 
-func (c *Client) GetBin(id int) {
-	currentURL, err := url.Parse(c.baseURL + "/" + strconv.Itoa(id))
+func (c *Client) GetBin(id string) {
+	currentURL, err := url.Parse(c.baseURL + "/" + id)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -114,8 +109,29 @@ func (c *Client) GetBin(id int) {
 	fmt.Println(string(body))
 }
 
-func (c *Client) UpdateBin() {
+func (c *Client) UpdateBin(data []byte, binId string) {
+	req, err := http.NewRequest("PUT", c.baseURL+"/"+binId, bytes.NewBuffer(data))
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
 
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Master-Key", c.apiKey)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("ошибка: " + err.Error())
+		return
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		fmt.Println("ошибка: статус код " + resp.Status)
+		return
+	}
 }
 
 func (c *Client) DeleteBin() {

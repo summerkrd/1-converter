@@ -30,7 +30,7 @@ func flagsHandler(client *api.Client) {
 	fList := flag.String("list", "", "список bins")
 	fFile := flag.String("file", "", "файл")
 	fName := flag.String("name", "", "имя бина")
-	fID := flag.Int("id", 0, "id")
+	fID := flag.String("id", "", "id")
 	flag.Parse()
 
 	LocalBinsData, err := data.ReadFile()
@@ -60,17 +60,22 @@ func flagsHandler(client *api.Client) {
 		}
 
 	} else if *fUpdate != "" {
-		if *fFile != "" && *fID != 0 {
-			client.UpdateBin()
+		if *fFile != "" && *fID != "" {
+			userData, err := data.ReadUserJSON(*fFile)
+			if err != nil {
+				fmt.Println("ошибка: не удалось прочитать UserJSON")
+				return
+			}
+			client.UpdateBin(*userData, *fID)
 		}
 
 	} else if *fDelete != "" {
-		if *fID != 0 {
+		if *fID != "" {
 			client.DeleteBin()
 		}
 
 	} else if *fGet != "" {
-		if *fID != 0 {
+		if *fID != "" {
 			client.GetBin(*fID)
 		}
 
