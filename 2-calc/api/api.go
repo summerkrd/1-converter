@@ -4,6 +4,7 @@ import (
 	"2-calc/config"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -33,12 +34,11 @@ func (c *Client) GetKey() string {
 	return c.apiKey
 }
 
-func (c *Client) CreateBin(data []byte, binName string) string {
+func (c *Client) CreateBin(data []byte, binName string) (string, error) {
 
 	req, err := http.NewRequest("POST", c.baseURL, bytes.NewBuffer(data))
 	if err != nil {
-		fmt.Println(err.Error())
-		return ""
+		return "", errors.New("ошибка: не удалось отправить request")
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -48,31 +48,27 @@ func (c *Client) CreateBin(data []byte, binName string) string {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println("ошибка: " + err.Error())
-		return ""
+		return "", errors.New("ошибка: не удалось получить ответ от API")
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 201 {
-		fmt.Println("ошибка: статус код " + resp.Status)
-		return ""
+		return "", errors.New("ошибка: статус код: " + resp.Status)
 	}
 
 	byteData, err := io.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println(err.Error())
-		return ""
+		return "", errors.New("ошибка: не удалось прочитать resp.Body")
 	}
 
 	var response Response
 	err = json.Unmarshal(byteData, &response)
 	if err != nil {
-		fmt.Println("ошибка: " + err.Error())
-		return ""
+		return "", errors.New("ошибка: не удалось преобразовать из json")
 	}
 
-	return response.Metadata.ID
+	return response.Metadata.ID, nil
 }
 
 func (c *Client) GetBin(id string) {
@@ -134,6 +130,6 @@ func (c *Client) UpdateBin(data []byte, binId string) {
 	}
 }
 
-func (c *Client) DeleteBin() {
-
+func (c *Client) DeleteBin(id string) error {
+	return nil
 }

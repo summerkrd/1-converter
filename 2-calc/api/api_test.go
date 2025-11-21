@@ -18,12 +18,32 @@ func CreateNewClient() (*api.Client, error) {
 }
 
 func TestGetBin(t *testing.T) {
-	id := "12345"
+
+}
+
+func TestCreateBin(t *testing.T) {
+	testData := []byte(`{"test": "value", "number": 123}`)
+	testName := "test-create-bin"
 
 	client, err := CreateNewClient()
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	binID, err := client.CreateBin(testData, testName)
+
 	if err != nil {
 		t.Error(err.Error())
 	}
 
-	client.GetBin(id)
+	if binID == "" {
+		t.Fatal("CreateBin вернул пустой ID")
+	}
+
+	defer func() {
+		err := client.DeleteBin(binID)
+		if err != nil {
+			t.Errorf("не удалось удалить bin: %v", err)
+		}
+	}()
 }
