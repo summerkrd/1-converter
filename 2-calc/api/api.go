@@ -71,7 +71,7 @@ func (c *Client) CreateBin(data []byte, binName string) (string, error) {
 	return response.Metadata.ID, nil
 }
 
-func (c *Client) GetBin(id string) (map[string]string, error) {
+func (c *Client) GetBin(id string) (map[string]any, error) {
 	currentURL, err := url.Parse(c.baseURL + "/" + id)
 	if err != nil {
 		return nil, err
@@ -97,7 +97,7 @@ func (c *Client) GetBin(id string) (map[string]string, error) {
 		return nil, errors.New("ошибка: не удалось прочитать тело ответа")
 	}
 
-	var binData map[string]string
+	var binData map[string]any
 	err = json.Unmarshal(body, &binData)
 	if err != nil {
 		return nil, errors.New("ошибка: не удалось преобразовать из json")

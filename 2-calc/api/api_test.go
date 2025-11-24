@@ -20,21 +20,9 @@ func CreateNewClient() (*api.Client, error) {
 
 func TestGetBin(t *testing.T) {
 	testData := []byte(`{"test": "value", "number": 123}`)
-	testName := "test-create-bin"
+	testName := "test-get-bin"
 
-	client, err := CreateNewClient()
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-
-	binID, err := client.CreateBin(testData, testName)
-	if err != nil {
-		t.Error(err.Error())
-	}
-
-	if binID == "" {
-		t.Fatal("CreateBin вернул пустой ID")
-	}
+	client, binID := createHelper(testData, testName, t)
 
 	defer func() {
 		err := client.DeleteBin(binID)
@@ -51,7 +39,7 @@ func TestGetBin(t *testing.T) {
 		t.Error("binData is nil")
 	}
 
-	var unmTestData map[string]string
+	var unmTestData map[string]any
 	err = json.Unmarshal(testData, &unmTestData)
 	if binData["test"] != unmTestData["test"] {
 		t.Error("ошибка: поле test не совпадает")
@@ -65,6 +53,18 @@ func TestCreateBin(t *testing.T) {
 	testData := []byte(`{"test": "value", "number": 123}`)
 	testName := "test-create-bin"
 
+	client, binID := createHelper(testData, testName, t)
+
+	defer func() {
+		err := client.DeleteBin(binID)
+		if err != nil {
+			t.Errorf("не удалось удалить bin: %v", err)
+		}
+	}()
+}
+
+func createHelper(testData []byte, testName string, t *testing.T) (*api.Client, string) {
+
 	client, err := CreateNewClient()
 	if err != nil {
 		t.Fatal(err.Error())
@@ -77,13 +77,8 @@ func TestCreateBin(t *testing.T) {
 	}
 
 	if binID == "" {
-		t.Fatal("CreateBin вернул пустой ID")
+		t.Error("CreateBin вернул пустой ID")
 	}
 
-	defer func() {
-		err := client.DeleteBin(binID)
-		if err != nil {
-			t.Errorf("не удалось удалить bin: %v", err)
-		}
-	}()
+	return client, binID
 }
