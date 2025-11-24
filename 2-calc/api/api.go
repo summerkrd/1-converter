@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -106,11 +105,10 @@ func (c *Client) GetBin(id string) (map[string]any, error) {
 	return binData, nil
 }
 
-func (c *Client) UpdateBin(data []byte, binId string) {
+func (c *Client) UpdateBin(data []byte, binId string) error {
 	req, err := http.NewRequest("PUT", c.baseURL+"/"+binId, bytes.NewBuffer(data))
 	if err != nil {
-		fmt.Println(err.Error())
-		return
+		return err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -119,16 +117,15 @@ func (c *Client) UpdateBin(data []byte, binId string) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println("ошибка: " + err.Error())
-		return
+		return errors.New("ошибка: " + err.Error())
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		fmt.Println("ошибка: статус код " + resp.Status)
-		return
+		return errors.New("ошибка: статус код " + resp.Status)
 	}
+	return nil
 }
 
 func (c *Client) DeleteBin(id string) error {
