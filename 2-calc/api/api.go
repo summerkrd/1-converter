@@ -128,6 +128,25 @@ func (c *Client) UpdateBin(data []byte, binId string) error {
 	return nil
 }
 
-func (c *Client) DeleteBin(id string) error {
+func (c *Client) DeleteBin(binId string) error {
+	req, err := http.NewRequest("DELETE", c.baseURL+"/"+binId, nil)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("X-Master-Key", c.apiKey)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return errors.New("ошибка: " + err.Error())
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return errors.New("ошибка: статус код " + resp.Status)
+	}
+
 	return nil
 }

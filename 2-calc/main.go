@@ -46,7 +46,7 @@ func flagsHandler(client *api.Client) {
 				fmt.Println("ошибка: не удалось прочитать UserJSON")
 				return
 			}
-			id := client.CreateBin(*userData, *fName)
+			id, _ := client.CreateBin(*userData, *fName)
 
 			newBin := data.BinInfo{
 				ID:   id,
@@ -71,7 +71,7 @@ func flagsHandler(client *api.Client) {
 
 	} else if *fDelete != "" {
 		if *fID != "" {
-			client.DeleteBin()
+			client.DeleteBin(*fID)
 		}
 
 	} else if *fGet != "" {

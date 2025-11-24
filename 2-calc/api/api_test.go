@@ -66,7 +66,7 @@ func TestCreateBin(t *testing.T) {
 func TestUpdateBin(t *testing.T) {
 	testData := []byte(`{"test": "value", "number": 123}`)
 	testNewData := []byte(`{"test": "value2", "number": 456}`)
-	testName := "test-get-bin"
+	testName := "test-update-bin"
 
 	client, binID := setupTestBin(t, testData, testName)
 
@@ -102,6 +102,22 @@ func TestUpdateBin(t *testing.T) {
 	}
 	if newData["number"] != unmTestData["number"] {
 		t.Error("не совпадает поле number")
+	}
+}
+
+func TestDeleteBin(t *testing.T) {
+	testData := []byte(`{"test": "value", "number": 123}`)
+	testName := "test-delete-bin"
+
+	client, binID := setupTestBin(t, testData, testName)
+	err := client.DeleteBin(binID)
+	if err != nil {
+		t.Error("не удалось удалить bin")
+	}
+
+	_, err = client.GetBin(binID)
+	if err == nil {
+		t.Error("бин не удалился")
 	}
 }
 
