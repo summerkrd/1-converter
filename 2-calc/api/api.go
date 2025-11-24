@@ -71,38 +71,39 @@ func (c *Client) CreateBin(data []byte, binName string) (string, error) {
 	return response.Metadata.ID, nil
 }
 
-func (c *Client) GetBin(id string) {
+func (c *Client) GetBin(id string) (map[string]string, error) {
 	currentURL, err := url.Parse(c.baseURL + "/" + id)
 	if err != nil {
-		fmt.Println(err.Error())
-		return
+		return nil, err
 	}
 	req, err := http.NewRequest("GET", currentURL.String(), nil)
 	if err != nil {
-		fmt.Println(err.Error())
-		return
+		return nil, err
 	}
 	req.Header.Set("X-Master-Key", c.apiKey)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println(err.Error())
-		return
+		return nil, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		fmt.Println("StatusCode not 200")
-		return
+		return nil, errors.New("StatusCode not 200")
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println("ошибка: не удалось прочитать тело ответа")
-		return
+		return nil, errors.New("ошибка: не удалось прочитать тело ответа")
 	}
 
-	fmt.Println(string(body))
+	var binData map[string]string
+	err = json.Unmarshal(body, &binData)
+	if err != nil {
+		return nil, errors.New("ошибка: не удалось преобразовать из json")
+	}
+
+	return binData, nil
 }
 
 func (c *Client) UpdateBin(data []byte, binId string) {
